@@ -12,11 +12,11 @@
     },
     "correct_answer": "C",
     "explanation": {
-      "correct": "Delta Time Travel relies on the transaction log (_delta_log) to access specific versions of the table.",
+      "correct": "Delta Time Travel uses the transaction log to query older table versions.",
       "options": {
-        "A": "Z-Ordering improves data skipping but doesn't provide historical queries.",
-        "B": "Schema evolution enables schema updates, not historic snapshots.",
-        "D": "Optimize Write improves file compaction, not versioning."
+        "A": "Z-Ordering improves data skipping but not historical access.",
+        "B": "Schema evolution updates table structure, not past versions.",
+        "D": "Optimize Write improves file layout."
       }
     }
   },
@@ -24,7 +24,7 @@
     "question_id": "A002",
     "domain": "Structured Streaming",
     "difficulty": "associate",
-    "question_text": "To ensure exactly-once semantics when writing to Delta Lake in a Structured Streaming query, which must be configured?",
+    "question_text": "To ensure exactly-once semantics when writing to Delta Lake, which must be configured?",
     "choices": {
       "A": "Trigger.Once",
       "B": "Checkpoint Location",
@@ -33,11 +33,11 @@
     },
     "correct_answer": "B",
     "explanation": {
-      "correct": "Checkpointing stores offsets and state to guarantee fault-tolerant, exactly-once processing.",
+      "correct": "Checkpointing stores offsets for recovery and exactly-once delivery.",
       "options": {
-        "A": "Trigger.Once processes one batch and stops.",
-        "C": "Caching does not provide fault-tolerance.",
-        "D": "Watermark manages late data, not exactly-once semantics."
+        "A": "Trigger.Once processes once then stops.",
+        "C": "Caching does not affect reliability.",
+        "D": "Watermark controls late data, not exactly-once guarantees."
       }
     }
   },
@@ -45,7 +45,7 @@
     "question_id": "A003",
     "domain": "Unity Catalog",
     "difficulty": "associate",
-    "question_text": "Which Unity Catalog object is the highest-level governance boundary?",
+    "question_text": "Which Unity Catalog object represents the highest-level governance boundary?",
     "choices": {
       "A": "Schema",
       "B": "Catalog",
@@ -54,11 +54,11 @@
     },
     "correct_answer": "C",
     "explanation": {
-      "correct": "A metastore is the top-most container regulating catalogs, schemas, and tables.",
+      "correct": "The metastore governs catalogs, schemas, tables, and more.",
       "options": {
-        "A": "Schemas are lower-level containers.",
-        "B": "Catalogs sit within a metastore.",
-        "D": "Volumes store files, not governance hierarchy."
+        "A": "Schemas live inside catalogs.",
+        "B": "Catalogs belong to a metastore.",
+        "D": "Volumes store files, not governance boundaries."
       }
     }
   },
@@ -66,20 +66,20 @@
     "question_id": "A004",
     "domain": "Auto Loader",
     "difficulty": "associate",
-    "question_text": "For large-scale ingestion where directory listing becomes expensive, which Auto Loader feature should be used?",
+    "question_text": "Which Auto Loader mode avoids repeated directory scanning for new files?",
     "choices": {
       "A": "Schema Hints",
       "B": "File Notification Mode",
-      "C": "COPY INTO",
-      "D": "Cloud-specific Indexing"
+      "C": "Directory-Based Mode Only",
+      "D": "Manual REST File Listing"
     },
     "correct_answer": "B",
     "explanation": {
-      "correct": "File notification mode uses cloud events (e.g., Event Grid / SNS) to avoid excessive directory listing.",
+      "correct": "File Notification Mode uses cloud events to detect new files.",
       "options": {
-        "A": "Schema hints guide schema inference.",
-        "C": "COPY INTO is batch, not streaming ingestion.",
-        "D": "No such Databricks feature exists."
+        "A": "Schema hints guide column inference.",
+        "C": "Directory listing scales poorly.",
+        "D": "REST-based listing is not recommended."
       }
     }
   },
@@ -87,20 +87,20 @@
     "question_id": "A005",
     "domain": "Spark Optimization",
     "difficulty": "associate",
-    "question_text": "A 5k-row table is joined with a 1B-row table. Which is preferred?",
+    "question_text": "A small table is joined with a very large fact table. What optimization improves join performance?",
     "choices": {
-      "A": "Broadcast the small table",
-      "B": "Repartition both tables randomly",
-      "C": "Convert both to CSV",
-      "D": "Disable AQE"
+      "A": "Disable Broadcast Joins",
+      "B": "Broadcast the small table",
+      "C": "Coalesce both to one partition",
+      "D": "Convert both to CSV"
     },
-    "correct_answer": "A",
+    "correct_answer": "B",
     "explanation": {
-      "correct": "Broadcast joins avoid large shuffles when one table is small.",
+      "correct": "Broadcasting avoids shuffling the large table.",
       "options": {
-        "B": "Random repartitioning increases shuffles.",
-        "C": "CSV slows performance.",
-        "D": "AQE helps optimize joins automatically."
+        "A": "Broadcasting is helpful, not harmful.",
+        "C": "Coalescing kills parallelism.",
+        "D": "CSV increases IO overhead."
       }
     }
   },
@@ -108,20 +108,20 @@
     "question_id": "A006",
     "domain": "Delta Lake",
     "difficulty": "associate",
-    "question_text": "Which setting enables automatic schema evolution during write operations?",
+    "question_text": "Which setting enables automatic schema evolution on write?",
     "choices": {
       "A": "spark.sql.shuffle.partitions",
       "B": "spark.databricks.delta.schema.autoMerge.enabled",
-      "C": "spark.sql.files.maxRecordsPerFile",
-      "D": "spark.databricks.delta.minReaderVersion"
+      "C": "spark.databricks.delta.minReaderVersion",
+      "D": "spark.sql.files.maxRecordsPerFile"
     },
     "correct_answer": "B",
     "explanation": {
-      "correct": "autoMerge allows automatic schema changes during writes.",
+      "correct": "autoMerge enables schema evolution.",
       "options": {
         "A": "Sets shuffle partitions.",
-        "C": "Controls file size.",
-        "D": "Controls Delta protocol compatibility."
+        "C": "Controls protocol compatibility.",
+        "D": "Controls file sizes."
       }
     }
   },
@@ -129,7 +129,7 @@
     "question_id": "A007",
     "domain": "Unity Catalog",
     "difficulty": "associate",
-    "question_text": "To create a table inside a schema, which minimum privilege is needed?",
+    "question_text": "Which privilege is required to create a table in a schema?",
     "choices": {
       "A": "USAGE",
       "B": "CREATE",
@@ -138,10 +138,10 @@
     },
     "correct_answer": "B",
     "explanation": {
-      "correct": "CREATE allows the user to create objects like tables.",
+      "correct": "CREATE allows creating new objects such as tables.",
       "options": {
-        "A": "USAGE only lets users reference the schema.",
-        "C": "MODIFY controls existing table writes.",
+        "A": "USAGE allows referencing the schema only.",
+        "C": "MODIFY affects existing tables.",
         "D": "EXECUTE applies to functions."
       }
     }
@@ -150,67 +150,65 @@
     "question_id": "A008",
     "domain": "Streaming",
     "difficulty": "associate",
-    "question_text": "What does watermarking mainly control in Structured Streaming?",
+    "question_text": "What does watermarking primarily control?",
     "choices": {
-      "A": "Rate limits",
-      "B": "When old state is dropped",
-      "C": "Cluster scaling",
-      "D": "File skipping"
+      "A": "Processing rate",
+      "B": "State cleanup of old events",
+      "C": "Cluster autoscaling",
+      "D": "Exactly-once behavior"
     },
     "correct_answer": "B",
     "explanation": {
-      "correct": "Watermarks allow dropping old state safely for stateful aggregations.",
+      "correct": "Watermarks signal when old state can be discarded.",
       "options": {
-        "A": "Rate limits are configured separately.",
-        "C": "Autoscaling is cluster-level.",
-        "D": "File skipping relates to Delta metadata."
+        "A": "Separate rate control mechanisms exist.",
+        "C": "Autoscaling is independent.",
+        "D": "Exactly-once is controlled by checkpoints."
       }
     }
   },
   {
     "question_id": "A009",
-    "domain": "Delta Lake / CDF",
+    "domain": "Delta CDF",
     "difficulty": "associate",
-    "question_text": "What is the correct method to read only changed rows from a CDF-enabled Delta table?",
+    "question_text": "Which API returns only changed rows from a Delta table with CDF enabled?",
     "choices": {
-      "A": "SELECT * FROM delta_table",
+      "A": "SELECT * FROM table",
       "B": "table_changes()",
-      "C": "VACUUM 0 HOURS",
+      "C": "VACUUM",
       "D": "DESCRIBE HISTORY"
     },
     "correct_answer": "B",
     "explanation": {
-      "correct": "table_changes() returns changed rows between versions.",
+      "correct": "table_changes() returns CDF rows between versions.",
       "options": {
-        "A": "Reads entire table.",
-        "C": "VACUUM clears old files.",
-        "D": "DESCRIBE HISTORY shows commit metadata only."
+        "A": "Returns full table.",
+        "C": "Removes old files.",
+        "D": "Shows commit metadata only."
       }
     }
   },
   {
     "question_id": "A010",
-    "domain": "SQL Warehouses",
+    "domain": "BI Compute",
     "difficulty": "associate",
-    "question_text": "Which compute type is best for BI dashboards?",
+    "question_text": "Which compute type is designed for BI dashboards?",
     "choices": {
-      "A": "Job clusters",
-      "B": "All-purpose clusters",
+      "A": "All-purpose clusters",
+      "B": "Job clusters",
       "C": "SQL Warehouses",
-      "D": "Local Spark"
+      "D": "Developer laptops"
     },
     "correct_answer": "C",
     "explanation": {
-      "correct": "SQL Warehouses support BI concurrency and autoscaling.",
+      "correct": "SQL Warehouses offer concurrency and autoscaling for BI.",
       "options": {
-        "A": "Used for ETL.",
-        "B": "Used for development.",
-        "D": "Not scalable."
+        "A": "All-purpose clusters are for interactive development.",
+        "B": "Job clusters are for ETL jobs.",
+        "D": "Not scalable for BI."
       }
     }
   },
-
-  /* ---------- 15 More Associate Questions (A011–A025) Continue ---------- */
 
   {
     "question_id": "A011",
@@ -218,18 +216,18 @@
     "difficulty": "associate",
     "question_text": "What does OPTIMIZE do?",
     "choices": {
-      "A": "Removes old files",
-      "B": "Compacts small files into larger ones",
-      "C": "Upgrades Delta protocol",
-      "D": "Runs indexing"
+      "A": "Deletes unreferenced files",
+      "B": "Compacts small files",
+      "C": "Upgrades table protocol",
+      "D": "Performs indexing"
     },
     "correct_answer": "B",
     "explanation": {
-      "correct": "OPTIMIZE merges many small files into fewer larger ones.",
+      "correct": "OPTIMIZE merges many small files into larger ones.",
       "options": {
-        "A": "VACUUM removes old files.",
-        "C": "DELTA protocol upgrade uses different commands.",
-        "D": "No Delta indexing exists."
+        "A": "VACUUM removes unreferenced files.",
+        "C": "Protocol upgrades use different commands.",
+        "D": "Delta has no separate index command."
       }
     }
   },
@@ -238,20 +236,20 @@
     "question_id": "A012",
     "domain": "DLT",
     "difficulty": "associate",
-    "question_text": "DLT expectations allow what?",
+    "question_text": "DLT expectations allow which behavior?",
     "choices": {
-      "A": "Manual schema enforcement only",
-      "B": "Data quality checks with metrics or dropping failed rows",
-      "C": "Cluster auto-scaling",
-      "D": "Job retries"
+      "A": "Only schema enforcement",
+      "B": "Data quality checks with drop or metric-only actions",
+      "C": "Cluster creation",
+      "D": "Retry logic"
     },
     "correct_answer": "B",
     "explanation": {
-      "correct": "DLT expectations perform data quality checks.",
+      "correct": "DLT expectations handle data quality with configurable behavior.",
       "options": {
-        "A": "Not only schema.",
-        "C": "Autoscaling is cluster-level.",
-        "D": "Job retries are workflow features."
+        "A": "Expectations go beyond schema.",
+        "C": "Clusters are managed separately.",
+        "D": "Retries belong to Workflows."
       }
     }
   },
@@ -262,283 +260,3 @@
     "difficulty": "associate",
     "question_text": "What does repartition(n) do?",
     "choices": {
-      "A": "Coalesces partitions",
-      "B": "Creates exactly n partitions with full shuffle",
-      "C": "Writes n output files",
-      "D": "Caches data"
-    },
-    "correct_answer": "B",
-    "explanation": {
-      "correct": "repartition(n) shuffles data to produce exactly n partitions.",
-      "options": {
-        "A": "coalesce reduces partitions.",
-        "C": "Output files depend on write operations.",
-        "D": "Caching is separate."
-      }
-    }
-  },
-
-  {
-    "question_id": "A014",
-    "domain": "Lakehouse",
-    "difficulty": "associate",
-    "question_text": "Where does raw ingested data land?",
-    "choices": {
-      "A": "Gold",
-      "B": "Bronze",
-      "C": "Silver",
-      "D": "Warehouse"
-    },
-    "correct_answer": "B",
-    "explanation": {
-      "correct": "Bronze layer stores raw ingested data.",
-      "options": {
-        "A": "Gold is curated KPIs.",
-        "C": "Silver is refined.",
-        "D": "Warehouse stores structured tables."
-      }
-    }
-  },
-
-  {
-    "question_id": "A015",
-    "domain": "Streaming",
-    "difficulty": "associate",
-    "question_text": "Which is true about Trigger.Once()?",
-    "choices": {
-      "A": "Runs continuously forever",
-      "B": "Processes all available data once and stops",
-      "C": "Guarantees exactly-once",
-      "D": "Requires no checkpoint"
-    },
-    "correct_answer": "B",
-    "explanation": {
-      "correct": "Trigger.Once processes all data once and ends.",
-      "options": {
-        "A": "Continuous mode runs forever.",
-        "C": "Exactly-once needs checkpointing.",
-        "D": "Checkpointing may still be needed."
-      }
-    }
-  },
-
-  {
-    "question_id": "A016",
-    "domain": "SQL",
-    "difficulty": "associate",
-    "question_text": "Which is best for BI semantic stability?",
-    "choices": {
-      "A": "Direct raw table exposure",
-      "B": "Views on top of tables",
-      "C": "Notebooks",
-      "D": "UDF-only access"
-    },
-    "correct_answer": "B",
-    "explanation": {
-      "correct": "Views provide stable interfaces independent of table changes.",
-      "options": {
-        "A": "Raw tables change often.",
-        "C": "Notebooks not BI friendly.",
-        "D": "UDFs complicate BI."
-      }
-    }
-  },
-
-  {
-    "question_id": "A017",
-    "domain": "Workflows",
-    "difficulty": "associate",
-    "question_text": "Which feature enables alerting on workflow failure?",
-    "choices": {
-      "A": "Git integration",
-      "B": "Webhooks",
-      "C": "Cluster UI",
-      "D": "SQL Dashboard"
-    },
-    "correct_answer": "B",
-    "explanation": {
-      "correct": "Webhooks trigger alerts to Slack or Teams.",
-      "options": {
-        "A": "Git is for code.",
-        "C": "Cluster UI doesn't alert.",
-        "D": "Dashboards only visualize."
-      }
-    }
-  },
-
-  {
-    "question_id": "A018",
-    "domain": "Unity Catalog",
-    "difficulty": "associate",
-    "question_text": "What is required to run SELECT on a table?",
-    "choices": {
-      "A": "MODIFY",
-      "B": "SELECT + USAGE",
-      "C": "EXECUTE",
-      "D": "CREATE"
-    },
-    "correct_answer": "B",
-    "explanation": {
-      "correct": "SELECT + USAGE privilege chain is needed.",
-      "options": {
-        "A": "MODIFY writes data.",
-        "C": "EXECUTE applies to functions.",
-        "D": "CREATE creates objects."
-      }
-    }
-  },
-
-  {
-    "question_id": "A019",
-    "domain": "Streaming",
-    "difficulty": "associate",
-    "question_text": "Which sink is recommended for a reliable streaming ETL pipeline?",
-    "choices": {
-      "A": "Delta",
-      "B": "CSV",
-      "C": "JSON",
-      "D": "Console"
-    },
-    "correct_answer": "A",
-    "explanation": {
-      "correct": "Delta provides ACID, checkpointing, and schema evolution.",
-      "options": {
-        "B": "CSV lacks transactional features.",
-        "C": "JSON is row-based.",
-        "D": "Console is for debugging."
-      }
-    }
-  },
-
-  {
-    "question_id": "A020",
-    "domain": "Security",
-    "difficulty": "associate",
-    "question_text": "Where should tokens be stored?",
-    "choices": {
-      "A": "Notebook text",
-      "B": "Secret scopes",
-      "C": "Cluster logs",
-      "D": "Table metadata"
-    },
-    "correct_answer": "B",
-    "explanation": {
-      "correct": "Secret scopes securely store credentials.",
-      "options": {
-        "A": "Insecure.",
-        "C": "Logs expose secrets.",
-        "D": "Not for secure storage."
-      }
-    }
-  },
-
-  {
-    "question_id": "A021",
-    "domain": "Delta Lake",
-    "difficulty": "associate",
-    "question_text": "Which command removes unreferenced files?",
-    "choices": {
-      "A": "OPTIMIZE",
-      "B": "VACUUM",
-      "C": "MERGE",
-      "D": "COPY INTO"
-    },
-    "correct_answer": "B",
-    "explanation": {
-      "correct": "VACUUM removes old unreferenced files.",
-      "options": {
-        "A": "OPTIMIZE compacts.",
-        "C": "MERGE upserts.",
-        "D": "COPY INTO loads files."
-      }
-    }
-  },
-
-  {
-    "question_id": "A022",
-    "domain": "Spark",
-    "difficulty": "associate",
-    "question_text": "Which action materializes transformations?",
-    "choices": {
-      "A": "select",
-      "B": "filter",
-      "C": "count",
-      "D": "withColumn"
-    },
-    "correct_answer": "C",
-    "explanation": {
-      "correct": "count triggers execution.",
-      "options": {
-        "A": "select is lazy.",
-        "B": "filter is lazy.",
-        "D": "withColumn is lazy."
-      }
-    }
-  },
-
-  {
-    "question_id": "A023",
-    "domain": "Streaming",
-    "difficulty": "associate",
-    "question_text": "Which operation is NOT supported in streaming?",
-    "choices": {
-      "A": "Distinct",
-      "B": "Watermark",
-      "C": "Join with static table",
-      "D": "LIMIT without aggregation"
-    },
-    "correct_answer": "D",
-    "explanation": {
-      "correct": "LIMIT is nondeterministic in streaming.",
-      "options": {
-        "A": "Distinct supported with state.",
-        "B": "Watermark allowed.",
-        "C": "Static joins supported."
-      }
-    }
-  },
-
-  {
-    "question_id": "A024",
-    "domain": "Lakehouse",
-    "difficulty": "associate",
-    "question_text": "Gold tables typically store:",
-    "choices": {
-      "A": "Raw data",
-      "B": "Aggregated KPIs",
-      "C": "Raw JSON",
-      "D": "Cluster metrics"
-    },
-    "correct_answer": "B",
-    "explanation": {
-      "correct": "Gold layer holds optimized business aggregates.",
-      "options": {
-        "A": "Raw goes in bronze.",
-        "C": "Raw JSON is bronze.",
-        "D": "Cluster metrics unrelated."
-      }
-    }
-  },
-
-  {
-    "question_id": "A025",
-    "domain": "Unity Catalog",
-    "difficulty": "associate",
-    "question_text": "What privilege allows listing objects inside a catalog?",
-    "choices": {
-      "A": "USAGE",
-      "B": "MODIFY",
-      "C": "CREATE",
-      "D": "EXECUTE"
-    },
-    "correct_answer": "A",
-    "explanation": {
-      "correct": "USAGE allows discovering catalog objects.",
-      "options": {
-        "B": "MODIFY writes data.",
-        "C": "CREATE creates objects.",
-        "D": "EXECUTE is for functions."
-      }
-    }
-  }
-]
