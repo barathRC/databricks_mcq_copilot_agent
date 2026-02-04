@@ -9,7 +9,9 @@ import streamlit as st
 
 from state_utils import get_session, save_session
 
-QUESTION_BANK_FILE = Path("question_bank.json")
+QUESTION_BANK_ASSOCIATE = Path("qb_db_de_associate.json")
+QUESTION_BANK_PROFESSIONAL = Path("qb_db_de_professional.json")
+
 
 EXAM_OPTIONS = {
     "Databricks Certified Data Engineer Associate": "associate",
