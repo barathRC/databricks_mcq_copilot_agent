@@ -1,0 +1,552 @@
+[
+  {
+    "question_id": "P001",
+    "domain": "Delta Lake / Performance",
+    "difficulty": "professional",
+    "question_text": "You manage a gold table queried heavily by BI dashboards on filters event_date and customer_id. What is the most effective optimization?",
+    "choices": {
+      "A": "Random repartition each batch",
+      "B": "Partition by event_date and Z-ORDER by customer_id",
+      "C": "Convert table to CSV",
+      "D": "Disable Photon"
+    },
+    "correct_answer": "B",
+    "explanation": {
+      "correct": "Partitioning + Z-Ordering aligns file layout with filters for maximum skipping.",
+      "options": {
+        "A": "Random repartitioning does not improve filter alignment.",
+        "C": "CSV removes Delta optimizations.",
+        "D": "Photon accelerates many workloads."
+      }
+    }
+  },
+  {
+    "question_id": "P002",
+    "domain": "DLT",
+    "difficulty": "professional",
+    "question_text": "Which combination supports both strict rules and soft monitoring rules in DLT?",
+    "choices": {
+      "A": "expect_or_fail for all",
+      "B": "expect_or_drop + expect (metric-only)",
+      "C": "expect for all rules",
+      "D": "Using schema inference rules only"
+    },
+    "correct_answer": "B",
+    "explanation": {
+      "correct": "expect_or_drop enforces strict rules; expect collects metrics.",
+      "options": {
+        "A": "Too strict for monitoring rules.",
+        "C": "No enforcement.",
+        "D": "Schema inference ≠ expectations."
+      }
+    }
+  },
+
+  /* ---------------- Next 23 Professional Questions (P003–P025) ---------------- */
+
+  {
+    "question_id": "P003",
+    "domain": "Structured Streaming",
+    "difficulty": "professional",
+    "question_text": "Why is watermarking required for stateful aggregations in long-running streams?",
+    "choices": {
+      "A": "To tune autoscaling",
+      "B": "To allow cleanup of state for old keys",
+      "C": "To guarantee exactly-once",
+      "D": "To reduce shuffle partitions"
+    },
+    "correct_answer": "B",
+    "explanation": {
+      "correct": "Watermarks signal that events older than threshold can be safely dropped from state.",
+      "options": {
+        "A": "Autoscaling unrelated.",
+        "C": "Checkpointing is needed instead.",
+        "D": "Watermarks don't impact shuffle."
+      }
+    }
+  },
+
+  {
+    "question_id": "P004",
+    "domain": "Workflows",
+    "difficulty": "professional",
+    "question_text": "You need Auto Loader ➝ DLT ➝ SQL Dashboard refresh ➝ Slack alert. How should you orchestrate?",
+    "choices": {
+      "A": "%run chaining",
+      "B": "Databricks Workflows with notebook, DLT, SQL, and webhook tasks",
+      "C": "DLT alone",
+      "D": "Manual notebook execution"
+    },
+    "correct_answer": "B",
+    "explanation": {
+      "correct": "Workflows support multi-task orchestration and webhook alerts.",
+      "options": {
+        "A": "No orchestration or alerts.",
+        "C": "DLT cannot refresh dashboards.",
+        "D": "Not automated."
+      }
+    }
+  },
+
+  {
+    "question_id": "P005",
+    "domain": "Unity Catalog / Lineage",
+    "difficulty": "professional",
+    "question_text": "Which feature lets you trace upstream datasets feeding a gold table?",
+    "choices": {
+      "A": "DESCRIBE HISTORY",
+      "B": "Unity Catalog Lineage Graph",
+      "C": "VACUUM",
+      "D": "Auto Loader schema logs"
+    },
+    "correct_answer": "B",
+    "explanation": {
+      "correct": "Lineage visualizes upstream and downstream tables automatically.",
+      "options": {
+        "A": "History shows metadata only.",
+        "C": "VACUUM unrelated.",
+        "D": "Incomplete for lineage."
+      }
+    }
+  },
+
+  {
+    "question_id": "P006",
+    "domain": "Delta Lake / MERGE",
+    "difficulty": "professional",
+    "question_text": "You must perform SCD Type 1 updates efficiently. Which pattern is best?",
+    "choices": {
+      "A": "INSERT only",
+      "B": "MERGE INTO",
+      "C": "DELETE + INSERT all rows",
+      "D": "UPDATE without join"
+    },
+    "correct_answer": "B",
+    "explanation": {
+      "correct": "MERGE INTO properly handles matched/unmatched upserts.",
+      "options": {
+        "A": "Duplicates existing data.",
+        "C": "Inefficient.",
+        "D": "Updates all rows blindly."
+      }
+    }
+  },
+
+  {
+    "question_id": "P007",
+    "domain": "Optimization",
+    "difficulty": "professional",
+    "question_text": "A join suffers from heavy skew on a particular key. What’s the most effective mitigation?",
+    "choices": {
+      "A": "Disable AQE",
+      "B": "Apply salting to the skewed key",
+      "C": "Use 1 partition",
+      "D": "Convert to CSV"
+    },
+    "correct_answer": "B",
+    "explanation": {
+      "correct": "Salting distributes skewed keys more evenly.",
+      "options": {
+        "A": "AQE helps skew.",
+        "C": "Harms performance.",
+        "D": "CSV worsens performance."
+      }
+    }
+  },
+
+  {
+    "question_id": "P008",
+    "domain": "Delta Lake / Small Files",
+    "difficulty": "professional",
+    "question_text": "Small files degrade performance. Which combination helps?",
+    "choices": {
+      "A": "OPTIMIZE + Z-ORDER",
+      "B": "VACUUM 0 HOURS",
+      "C": "Short checkpoints",
+      "D": "Disable caching"
+    },
+    "correct_answer": "A",
+    "explanation": {
+      "correct": "OPTIMIZE compacts; Z-ORDER improves skipping.",
+      "options": {
+        "B": "Dangerous retention.",
+        "C": "Does not help files.",
+        "D": "Hurts BI."
+      }
+    }
+  },
+
+  {
+    "question_id": "P009",
+    "domain": "External Locations",
+    "difficulty": "professional",
+    "question_text": "To manage external cloud data via Unity Catalog, what is required first?",
+    "choices": {
+      "A": "Mounting paths via dbutils",
+      "B": "Storage Credential + External Location",
+      "C": "Local file system sync",
+      "D": "Cluster init scripts"
+    },
+    "correct_answer": "B",
+    "explanation": {
+      "correct": "Storage credentials authorize UC, and external locations map cloud paths.",
+      "options": {
+        "A": "Legacy pattern; bypasses UC.",
+        "C": "Not relevant.",
+        "D": "Init scripts don't govern storage identity."
+      }
+    }
+  },
+
+  {
+    "question_id": "P010",
+    "domain": "SQL Warehouses",
+    "difficulty": "professional",
+    "question_text": "How does Photon improve performance?",
+    "choices": {
+      "A": "Row-based execution",
+      "B": "Vectorized engine optimized for Delta",
+      "C": "Disables statistics",
+      "D": "Disables caching"
+    },
+    "correct_answer": "B",
+    "explanation": {
+      "correct": "Photon is a native vectorized engine optimized for SQL workloads.",
+      "options": {
+        "A": "Photon is columnar.",
+        "C": "Statistics still used.",
+        "D": "Delta cache is compatible."
+      }
+    }
+  },
+
+  {
+    "question_id": "P011",
+    "domain": "Streaming",
+    "difficulty": "professional",
+    "question_text": "To achieve near-exactly once behavior in foreachBatch, which approach is best?",
+    "choices": {
+      "A": "Write without MERGE",
+      "B": "Use MERGE with a unique key + checkpointing",
+      "C": "Disable checkpoints",
+      "D": "Use trigger.once"
+    },
+    "correct_answer": "B",
+    "explanation": {
+      "correct": "Idempotent MERGE + checkpointing prevents duplicate processing.",
+      "options": {
+        "A": "Duplicates risk.",
+        "C": "Loses state.",
+        "D": "Not continuous streaming."
+      }
+    }
+  },
+
+  {
+    "question_id": "P012",
+    "domain": "DLT",
+    "difficulty": "professional",
+    "question_text": "Which DLT mode supports near-real time updates?",
+    "choices": {
+      "A": "Triggered batch",
+      "B": "Continuous mode",
+      "C": "Paused mode",
+      "D": "Offline notebook mode"
+    },
+    "correct_answer": "B",
+    "explanation": {
+      "correct": "Continuous mode processes data incrementally.",
+      "options": {
+        "A": "Triggered is batch.",
+        "C": "Not applicable.",
+        "D": "Not DLT pipeline mode."
+      }
+    }
+  },
+
+  {
+    "question_id": "P013",
+    "domain": "Row-Level Security",
+    "difficulty": "professional",
+    "question_text": "How do you restrict access so users see only rows for their assigned region?",
+    "choices": {
+      "A": "Dynamic views with row filters",
+      "B": "VACUUM",
+      "C": "dbutils mount ACLs",
+      "D": "EXECUTE privilege"
+    },
+    "correct_answer": "A",
+    "explanation": {
+      "correct": "Row filters + dynamic views enforce row-level access.",
+      "options": {
+        "B": "Not related.",
+        "C": "Legacy pattern.",
+        "D": "Function-only privilege."
+      }
+    }
+  },
+
+  {
+    "question_id": "P014",
+    "domain": "AQE",
+    "difficulty": "professional",
+    "question_text": "How does AQE help improve performance?",
+    "choices": {
+      "A": "Fixes the plan early",
+      "B": "Optimizes partitions and join strategies at runtime",
+      "C": "Removes Delta logs",
+      "D": "Disables broadcast joins"
+    },
+    "correct_answer": "B",
+    "explanation": {
+      "correct": "AQE adapts at runtime for better join/shuffle performance.",
+      "options": {
+        "A": "Opposite.",
+        "C": "Delta logs unrelated.",
+        "D": "Broadcast may be added or removed dynamically."
+      }
+    }
+  },
+
+  {
+    "question_id": "P015",
+    "domain": "End-to-End Architecture",
+    "difficulty": "professional",
+    "question_text": "Which architecture aligns to Databricks best practices?",
+    "choices": {
+      "A": "Raw → Bronze → Silver → Gold → BI",
+      "B": "Raw CSV directly for BI",
+      "C": "Gold only",
+      "D": "Notebook-only pipelines"
+    },
+    "correct_answer": "A",
+    "explanation": {
+      "correct": "Medallion architecture is the recommended Lakehouse pattern.",
+      "options": {
+        "B": "FPS significantly lower.",
+        "C": "Missing curation layers.",
+        "D": "Not scalable."
+      }
+    }
+  },
+
+  {
+    "question_id": "P016",
+    "domain": "Unity Catalog / External Data",
+    "difficulty": "professional",
+    "question_text": "Which step is mandatory before creating external tables in Unity Catalog?",
+    "choices": {
+      "A": "Mount path via dbutils",
+      "B": "Create Storage Credential",
+      "C": "Upload data into DBFS root",
+      "D": "Disable security mode"
+    },
+    "correct_answer": "B",
+    "explanation": {
+      "correct": "Storage Credentials define identity for accessing cloud storage.",
+      "options": {
+        "A": "Mounts bypass UC.",
+        "C": "DBFS root not required.",
+        "D": "Security mode must remain on."
+      }
+    }
+  },
+
+  {
+    "question_id": "P017",
+    "domain": "Optimization",
+    "difficulty": "professional",
+    "question_text": "Query latency increases due to large shuffle. Which setting helps?",
+    "choices": {
+      "A": "Enable AQE",
+      "B": "Disable caching",
+      "C": "Use CSV instead of Delta",
+      "D": "Increase shuffle partitions to 10,000"
+    },
+    "correct_answer": "A",
+    "explanation": {
+      "correct": "AQE dynamically reduces shuffle partitions.",
+      "options": {
+        "B": "Caching helps repeated queries.",
+        "C": "CSV is slow.",
+        "D": "Too many partitions increases overhead."
+      }
+    }
+  },
+
+  {
+    "question_id": "P018",
+    "domain": "Security",
+    "difficulty": "professional",
+    "question_text": "Best place to store external API keys?",
+    "choices": {
+      "A": "Notebook variables",
+      "B": "Unity Catalog Secret",
+      "C": "Cluster tags",
+      "D": "Log files"
+    },
+    "correct_answer": "B",
+    "explanation": {
+      "correct": "UC Secrets provide secure credential storage.",
+      "options": {
+        "A": "Hardcoding unsafe.",
+        "C": "Not secure.",
+        "D": "Logs are unsafe."
+      }
+    }
+  },
+
+  {
+    "question_id": "P019",
+    "domain": "Scalability",
+    "difficulty": "professional",
+    "question_text": "A streaming job must process 100k events/s with low latency. Which scaling pattern fits?",
+    "choices": {
+      "A": "Single-node",
+      "B": "Autoscaling cluster + optimized shuffle",
+      "C": "One executor only",
+      "D": "Triggered batch daily"
+    },
+    "correct_answer": "B",
+    "explanation": {
+      "correct": "Autoscaling with optimized shuffle handles load bursts.",
+      "options": {
+        "A": "Not distributed.",
+        "C": "Underpowered.",
+        "D": "Not streaming."
+      }
+    }
+  },
+
+  {
+    "question_id": "P020",
+    "domain": "Governance",
+    "difficulty": "professional",
+    "question_text": "To implement separation of duties between data engineers and data consumers, use:",
+    "choices": {
+      "A": "Unity Catalog fine-grained privileges",
+      "B": "dbutils mounts",
+      "C": "Local credentials",
+      "D": "All-purpose clusters only"
+    },
+    "correct_answer": "A",
+    "explanation": {
+      "correct": "UC fine-grained access controls allow secure separation.",
+      "options": {
+        "B": "Mounts bypass UC.",
+        "C": "Local credentials risky.",
+        "D": "Clusters do not enforce governance."
+      }
+    }
+  },
+
+  {
+    "question_id": "P021",
+    "domain": "DLT / Testing",
+    "difficulty": "professional",
+    "question_text": "How should DLT pipelines be validated before production?",
+    "choices": {
+      "A": "Deploy directly to prod",
+      "B": "Use DLT development mode with sampling",
+      "C": "Manual SQL only",
+      "D": "Disable expectations"
+    },
+    "correct_answer": "B",
+    "explanation": {
+      "correct": "DLT development mode supports quick iteration, sampling and debugging.",
+      "options": {
+        "A": "Risky.",
+        "C": "Not DLT-focused.",
+        "D": "Expectations essential for quality."
+      }
+    }
+  },
+
+  {
+    "question_id": "P022",
+    "domain": "Databricks SQL",
+    "difficulty": "professional",
+    "question_text": "You want deterministic BI refreshes on large tables. Which feature helps?",
+    "choices": {
+      "A": "Materialized Views",
+      "B": "Trigger.Once",
+      "C": "CSV caching",
+      "D": "Stream-stream join"
+    },
+    "correct_answer": "A",
+    "explanation": {
+      "correct": "Materialized Views allow efficient incremental recomputation.",
+      "options": {
+        "B": "Trigger.Once not for BI.",
+        "C": "CSV not performant.",
+        "D": "Not BI relevant."
+      }
+    }
+  },
+
+  {
+    "question_id": "P023",
+    "domain": "Unity Catalog",
+    "difficulty": "professional",
+    "question_text": "To restrict CREATE TABLE to specific groups, assign:",
+    "choices": {
+      "A": "Ownership",
+      "B": "CREATE privilege on schema",
+      "C": "EXECUTE privilege",
+      "D": "Row filters"
+    },
+    "correct_answer": "B",
+    "explanation": {
+      "correct": "CREATE controls object creation.",
+      "options": {
+        "A": "Ownership too broad.",
+        "C": "Not relevant.",
+        "D": "Controls rows, not creation."
+      }
+    }
+  },
+
+  {
+    "question_id": "P024",
+    "domain": "Optimization",
+    "difficulty": "professional",
+    "question_text": "To reduce large file scan cost, use:",
+    "choices": {
+      "A": "Z-ORDER on frequent filter columns",
+      "B": "CSV conversion",
+      "C": "Coalesce(1)",
+      "D": "No statistics"
+    },
+    "correct_answer": "A",
+    "explanation": {
+      "correct": "Z-ORDER clusters data to maximize skipping.",
+      "options": {
+        "B": "CSV slow.",
+        "C": "Removes parallelism.",
+        "D": "Statistics help optimizers."
+      }
+    }
+  },
+
+  {
+    "question_id": "P025",
+    "domain": "End-to-End",
+    "difficulty": "professional",
+    "question_text": "Which Lakehouse pattern supports both streaming and batch ETL?",
+    "choices": {
+      "A": "Bronze-Silver-Gold",
+      "B": "Single giant table",
+      "C": "Unmanaged CSV zones",
+      "D": "Notebook-only logic"
+    },
+    "correct_answer": "A",
+    "explanation": {
+      "correct": "Medallion architecture supports multi-hop refinement for any ingestion style.",
+      "options": {
+        "B": "Poor design.",
+        "C": "Not reliable.",
+        "D": "Not scalable."
+      }
+    }
+  }
+]
