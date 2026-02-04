@@ -317,8 +317,6 @@ def show_navigator(session: Dict[str, Any], questions: Dict[str, Dict[str, Any]]
 def show_question_panel(session: Dict[str, Any], questions: Dict[str, Dict[str, Any]]):
     qids = session["question_order"]
     total = len(qids)
-
-    # Current question index
     idx = st.session_state.current_index
     qid = qids[idx]
     q = questions[qid]
@@ -332,11 +330,11 @@ def show_question_panel(session: Dict[str, Any], questions: Dict[str, Dict[str, 
     st.write(q["question_text"])
     st.markdown("---")
 
-    # ---- Choices ----
+    # Choices
     options = list(q["choices"].keys())
     labels = [f"{opt}) {q['choices'][opt]}" for opt in options]
 
-    # Preselect previously chosen answer if any
+    # Preselect if answered
     default_index = 0
     if r["choice"] in options:
         default_index = options.index(r["choice"])
@@ -349,7 +347,7 @@ def show_question_panel(session: Dict[str, Any], questions: Dict[str, Dict[str, 
     )
     selected_choice = selected_label.split(")")[0]
 
-    # ---- Mark for review ----
+    # Mark for review
     review_flag = st.checkbox(
         "Mark this question for review",
         value=bool(r["review"]),
@@ -361,38 +359,29 @@ def show_question_panel(session: Dict[str, Any], questions: Dict[str, Dict[str, 
 
     col_submit, col_prev, col_next = st.columns([1.5, 1, 1])
 
-    # ---- Submit Answer ----
     if col_submit.button("Submit Answer", key=f"submit_{qid}"):
         r["choice"] = selected_choice
         r["correct"] = (selected_choice == q["correct_answer"])
         save_session(session["username"], session["exam_code"], session)
 
-        # Always show correctness + correct answer
-        correct_letter = q["correct_answer"]
-        correct_text = q["choices"][correct_letter]
-
         if r["correct"]:
             feedback_placeholder.success("✅ Correct!")
         else:
-            feedback_placeholder.error("❌ Incorrect.")
+            feedback_placeholder.error(f"❌ Incorrect. Correct answer is {q['correct_answer']}.")
 
         with feedback_placeholder.container():
-            st.markdown(f"**Correct answer:** {correct_letter} – {correct_text}")
             st.markdown("**Explanation:**")
             st.write(q["explanation"]["correct"])
             st.markdown("**Why other options are incorrect:**")
             for opt, exp in q["explanation"]["options"].items():
                 st.write(f"- **{opt}**: {exp}")
 
-    # ---- Navigation: Previous / Next ----
-    # Use experimental_rerun() so the new question appears immediately
+    # Navigation
     if col_prev.button("⬅ Previous", disabled=(idx == 0)):
         st.session_state.current_index = max(0, idx - 1)
-        st.experimental_rerun()
 
     if col_next.button("Next ➡", disabled=(idx == total - 1)):
         st.session_state.current_index = min(total - 1, idx + 1)
-        st.experimental_rerun()
 
 
 # ------------------ FINAL SUMMARY ------------------
