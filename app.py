@@ -3,15 +3,16 @@ import json
 import random
 import time
 from pathlib import Path
-from typing import Dict, Any, List
+from typing import Dict, Any
 
 import streamlit as st
 
 from state_utils import get_session, save_session
 
-QUESTION_BANK_ASSOCIATE = Path("qb_db_de_associate.json")
-QUESTION_BANK_PROFESSIONAL = Path("qb_db_de_professional.json")
+# ------------------ QUESTION BANK FILES ------------------
 
+QUESTION_BANK_ASSOCIATE = Path("question_bank_associate.json")
+QUESTION_BANK_PROFESSIONAL = Path("question_bank_professional.json")
 
 EXAM_OPTIONS = {
     "Databricks Certified Data Engineer Associate": "associate",
@@ -19,40 +20,68 @@ EXAM_OPTIONS = {
 }
 
 
-# ------------- Question Bank Loader -----------------
+# ------------------ QUESTION LOADER ------------------
 
 @st.cache_data
-def load_questions() -> Dict[str, Dict[str, Any]]:
-    data = json.loads(QUESTION_BANK_FILE.read_text())
+def load_questions_for_exam(exam_code: str) -> Dict[str, Dict[str, Any]]:
+    """
+    Load the question bank for the selected exam.
+    exam_code: "associate" or "professional".
+    Returns a dict keyed by question_id.
+    """
+    if exam_code == "associate":
+        path = QUESTION_BANK_ASSOCIATE
+    else:
+        path = QUESTION_BANK_PROFESSIONAL
+
+    if not path.exists():
+        st.error(f"Question bank file not found: {path}")
+        st.stop()
+
+    try:
+        data = json.loads(path.read_text())
+    except Exception as e:
+        st.error(f"Failed to read question bank file {path}: {e}")
+        st.stop()
+
+    # Return as dict keyed by question_id
     return {q["question_id"]: q for q in data}
 
 
-# ------------- Session State Initialization ----------
+# ------------------ SESSION INITIALIZATION ------------------
 
 def init_app():
     if "initialized" not in st.session_state:
         st.session_state.initialized = True
         st.session_state.username = ""
-        st.session_state.questions = load_questions()
         st.session_state.session = None
         st.session_state.current_index = 0
         st.session_state.last_tick = time.time()
         st.session_state.show_summary = False
 
+        # Default exam selection
         st.session_state.exam_label = list(EXAM_OPTIONS.keys())[0]
         st.session_state.exam_code = EXAM_OPTIONS[st.session_state.exam_label]
 
+        # questions will be loaded lazily after exam selection
+        st.session_state.questions = {}
 
-# ------------- New Test Session ----------------------
 
-def create_new_session(username: str, exam_label: str, exam_code: str, shuffle: bool = True) -> Dict[str, Any]:
-    questions = st.session_state.questions
+# ------------------ SESSION CREATION ------------------
 
-    # Filter questions belonging to this exam by difficulty
-    qids = [qid for qid, q in questions.items() if q.get("difficulty") == exam_code]
-
+def create_new_session(
+    username: str,
+    exam_label: str,
+    exam_code: str,
+    questions: Dict[str, Dict[str, Any]],
+    shuffle: bool = True
+) -> Dict[str, Any]:
+    """
+    Create a new test session for a user & exam using the provided questions.
+    """
+    qids = list(questions.keys())
     if not qids:
-        raise ValueError(f"No questions found for exam type: {exam_label} (difficulty={exam_code})")
+        raise ValueError(f"No questions found for exam: {exam_label} (difficulty={exam_code})")
 
     if shuffle:
         random.shuffle(qids)
@@ -75,7 +104,7 @@ def create_new_session(username: str, exam_label: str, exam_code: str, shuffle: 
     return session
 
 
-# ------------- Timer & Summary -----------------------
+# ------------------ TIMER & SUMMARY ------------------
 
 def update_timer():
     session = st.session_state.session
@@ -115,7 +144,7 @@ def format_time(seconds: int) -> str:
     return f"{h:02d}:{m:02d}:{s:02d}"
 
 
-# ------------- Main App ------------------------------
+# ------------------ MAIN APP ------------------
 
 def main():
     st.set_page_config(
@@ -124,11 +153,10 @@ def main():
     )
 
     init_app()
-    questions = st.session_state.questions
 
     st.title("🧠 Databricks Data Engineer – Intelligent MCQ Assessment Agent")
 
-    # -------- Sidebar: User / Session Controls --------
+    # -------- SIDEBAR: USER & EXAM CONTROLS --------
     with st.sidebar:
         st.header("User / Exam Selection")
 
@@ -141,7 +169,9 @@ def main():
         # Exam selector
         st.session_state.exam_label = st.selectbox(
             "Select Exam",
-            options=list(EXAM_OPTIONS.keys())
+            options=list(EXAM_OPTIONS.keys()),
+            index=list(EXAM_OPTIONS.keys()).index(st.session_state.exam_label)
+            if "exam_label" in st.session_state else 0
         )
         st.session_state.exam_code = EXAM_OPTIONS[st.session_state.exam_label]
 
@@ -149,12 +179,18 @@ def main():
 
         col1, col2 = st.columns(2)
         if st.session_state.username.strip():
+            # Start New Test
             if col1.button("Start New Test", use_container_width=True):
+                # Load questions for the selected exam
+                questions = load_questions_for_exam(st.session_state.exam_code)
+                st.session_state.questions = questions
+
                 try:
                     session = create_new_session(
                         st.session_state.username,
                         st.session_state.exam_label,
                         st.session_state.exam_code,
+                        questions,
                         shuffle=shuffle_opt
                     )
                 except ValueError as e:
@@ -167,6 +203,7 @@ def main():
                     save_session(session["username"], session["exam_code"], session)
                     st.success(f"New test started for: {session['exam_label']}")
 
+            # Resume Last Test
             if col2.button("Resume Last Test", use_container_width=True):
                 saved = get_session(st.session_state.username, st.session_state.exam_code)
                 if saved:
@@ -174,9 +211,13 @@ def main():
                     st.session_state.current_index = 0
                     st.session_state.last_tick = time.time()
                     st.session_state.show_summary = saved.get("completed", False)
+
+                    # Load the corresponding questions for this exam
+                    st.session_state.questions = load_questions_for_exam(saved["exam_code"])
+
                     st.success(f"Session restored for: {saved.get('exam_label')}")
                 else:
-                    st.warning("No saved session found for this user in this exam.")
+                    st.warning("No saved session found for this user and exam.")
 
         if st.session_state.session:
             st.markdown("---")
@@ -185,7 +226,7 @@ def main():
             st.caption(f"Questions: {len(s['question_order'])}")
             st.caption(f"Elapsed: {format_time(s['elapsed_seconds'])}")
 
-    # -------- Guard: Require user & session --------
+    # -------- GUARD: REQUIRE USER & SESSION --------
 
     if not st.session_state.username.strip():
         st.info("Enter your name/ID in the sidebar to begin.")
@@ -193,18 +234,24 @@ def main():
 
     session = st.session_state.session
     if not session:
-        st.info("Select exam, then start or resume a test.")
+        st.info("Select an exam, then start a new test or resume a previous test from the sidebar.")
         return
+
+    # Ensure questions are loaded for this exam
+    if not st.session_state.questions:
+        st.session_state.questions = load_questions_for_exam(session["exam_code"])
+
+    questions = st.session_state.questions
 
     # Update timer
     update_timer()
 
-    # If completed, show final summary
+    # Completed? Show final summary
     if session.get("completed", False) or st.session_state.show_summary:
         show_final_summary(session, questions)
         return
 
-    # -------- Layout: Navigator + Question Panel ------
+    # -------- MAIN LAYOUT: LEFT NAV + RIGHT QUESTION --------
     nav_col, main_col = st.columns([1.4, 2.6])
 
     with nav_col:
@@ -214,7 +261,7 @@ def main():
         show_question_panel(session, questions)
 
 
-# ------------- Navigator (Left Column) ----------------
+# ------------------ NAVIGATOR (LEFT COLUMN) ------------------
 
 def show_navigator(session: Dict[str, Any], questions: Dict[str, Dict[str, Any]]):
     st.subheader("Question Navigator")
@@ -235,7 +282,7 @@ def show_navigator(session: Dict[str, Any], questions: Dict[str, Dict[str, Any]]
 
     st.markdown("**Legend:** ✅ answered • 🔁 review • ⬜ not answered")
 
-    # Question buttons
+    # List of question buttons
     for idx, qid in enumerate(qids, start=1):
         resp = session["responses"][qid]
         icon = "⬜"
@@ -243,6 +290,7 @@ def show_navigator(session: Dict[str, Any], questions: Dict[str, Dict[str, Any]]
             icon = "✅"
         if resp["review"]:
             icon = "🔁"
+
         if st.button(f"Q{idx} {icon}", key=f"nav_{idx}", use_container_width=True):
             st.session_state.current_index = idx - 1
 
@@ -250,7 +298,7 @@ def show_navigator(session: Dict[str, Any], questions: Dict[str, Dict[str, Any]]
     st.subheader("Progress")
 
     summary = compute_summary(session)
-    st.metric("Exam", session.get("exam_label"))
+    st.metric("Exam", session.get("exam_label", "N/A"))
     st.metric("Elapsed Time", format_time(session["elapsed_seconds"]))
     st.metric("Attempted", f"{summary['attempted']} / {total}")
     st.metric("Correct", summary["correct"])
@@ -264,7 +312,7 @@ def show_navigator(session: Dict[str, Any], questions: Dict[str, Dict[str, Any]]
         st.experimental_rerun()
 
 
-# ------------- Question Panel ------------------------
+# ------------------ QUESTION PANEL (RIGHT COLUMN) ------------------
 
 def show_question_panel(session: Dict[str, Any], questions: Dict[str, Dict[str, Any]]):
     qids = session["question_order"]
@@ -277,7 +325,7 @@ def show_question_panel(session: Dict[str, Any], questions: Dict[str, Dict[str, 
     st.subheader(f"Question {idx + 1} of {total}")
     st.caption(
         f"Exam: {session.get('exam_label', 'N/A')} • "
-        f"ID: {qid} • Domain: {q['domain']} • Difficulty: {q.get('difficulty', 'N/A')}"
+        f"ID: {qid} • Domain: {q.get('domain', 'N/A')} • Difficulty: {q.get('difficulty', 'N/A')}"
     )
     st.write(q["question_text"])
     st.markdown("---")
@@ -286,6 +334,7 @@ def show_question_panel(session: Dict[str, Any], questions: Dict[str, Dict[str, 
     options = list(q["choices"].keys())
     labels = [f"{opt}) {q['choices'][opt]}" for opt in options]
 
+    # Preselect if answered
     default_index = 0
     if r["choice"] in options:
         default_index = options.index(r["choice"])
@@ -327,6 +376,7 @@ def show_question_panel(session: Dict[str, Any], questions: Dict[str, Dict[str, 
             for opt, exp in q["explanation"]["options"].items():
                 st.write(f"- **{opt}**: {exp}")
 
+    # Navigation
     if col_prev.button("⬅ Previous", disabled=(idx == 0)):
         st.session_state.current_index = max(0, idx - 1)
 
@@ -334,7 +384,7 @@ def show_question_panel(session: Dict[str, Any], questions: Dict[str, Dict[str, 
         st.session_state.current_index = min(total - 1, idx + 1)
 
 
-# ------------- Summary -------------------------------
+# ------------------ FINAL SUMMARY ------------------
 
 def show_final_summary(session: Dict[str, Any], questions: Dict[str, Dict[str, Any]]):
     st.header("📊 Final Summary")
@@ -342,7 +392,7 @@ def show_final_summary(session: Dict[str, Any], questions: Dict[str, Dict[str, A
     summary = compute_summary(session)
 
     st.write(f"**User:** {session['username']}")
-    st.write(f"**Exam:** {session.get('exam_label')}")
+    st.write(f"**Exam:** {session.get('exam_label', 'N/A')}")
     st.write(f"**Total Questions:** {len(session['question_order'])}")
     st.write(f"**Elapsed Time:** {format_time(session['elapsed_seconds'])}")
     st.write(
@@ -358,7 +408,7 @@ def show_final_summary(session: Dict[str, Any], questions: Dict[str, Dict[str, A
         q = questions[qid]
         r = session["responses"][qid]
 
-        st.markdown(f"### Q{idx}. [{q['domain']}]")
+        st.markdown(f"### Q{idx}. [{q.get('domain', 'N/A')}]")
         st.write(q["question_text"])
 
         for key, text in q["choices"].items():
@@ -385,7 +435,7 @@ def show_final_summary(session: Dict[str, Any], questions: Dict[str, Dict[str, A
 
         st.markdown("---")
 
-    st.success("You may switch exam in the sidebar and start the next test.")
+    st.success("You can switch exam in the sidebar and start a new test for another certification.")
 
 
 if __name__ == "__main__":
